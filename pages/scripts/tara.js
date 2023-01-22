@@ -18,8 +18,9 @@
 
 class Tara
 {
-	constructor(ArrayBuffer)
+	constructor(ArrayBuffer, parseCallback)
 	{
+		this.callback = parseCallback;
 		this.buffer = new byteStream(ArrayBuffer);
 		this.files = [];
 
@@ -55,6 +56,8 @@ class Tara
 			}
 			this.files[fileIdx].push(content);
 		}
+
+		this.callback(this);
 	}
 }
 

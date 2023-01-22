@@ -32,8 +32,6 @@ function main()
 	submitBtn.fileArea = fileArea;
 	submitBtn.addEventListener("click", loadPropyl);
 
-	console.log(files);
-
 	console.log("Done!");
 }
 
@@ -60,6 +58,20 @@ function loadPropyl(event)
 
 function loadTara(event)
 {
-	const tara = new Tara(event.target.result);
+	const tara = new Tara(event.target.result,(tara) => {
+		const fileList = document.getElementById("files");
+		for (const file of tara.files)
+		{
+			console.log("File");
+			const tableRow = document.createElement("tr");
+			const name = document.createElement("td");
+			const size = document.createElement("td");
+			name.appendChild(document.createTextNode(file[0]));
+			size.appendChild(document.createTextNode(file[1]));
+			tableRow.appendChild(name);
+			tableRow.appendChild(size);
+			fileList.appendChild(tableRow);
+		}
+	});
 	event.target.taras.push(tara);
 }
