@@ -27,8 +27,12 @@ function main()
 	const fileArea = document.getElementById("propyl-folder");
 	const reader = new FileReader();
 
+	let files = [];
+	submitBtn.files = files;
 	submitBtn.fileArea = fileArea;
 	submitBtn.addEventListener("click", loadPropyl);
+
+	console.log(files);
 
 	console.log("Done!");
 }
@@ -40,17 +44,22 @@ function loadPropyl(event)
 
 	// XXX: Handle empty file uploads
 
-	let files = [];
 	for (const file of event.target.fileArea.files)
 	{
 		console.log(file.webkitRelativePath);
 		const fileReader = new FileReader();
-		fileReader.files = files;
+		fileReader.taras = event.target.files;
 		fileReader.addEventListener("error", () => { console.error("Failed to load file from propyl!"); });
-		fileReader.addEventListener("load", (event) => { console.log("Loaded"); event.target.files.push(event.target.result); });
+		fileReader.addEventListener("load", loadTara); 
 		fileReader.readAsArrayBuffer(file);
 	}
 
 	// XXX: We should wait for all the files to finish loading, make an elegant fetching solution!
-	console.log(files);
+	// Perhaps even dynamic loading? E.g. load on demand.
+}
+
+function loadTara(event)
+{
+	const tara = new Tara(event.target.result);
+	event.target.taras.push(tara);
 }
