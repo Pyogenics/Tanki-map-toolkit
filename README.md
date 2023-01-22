@@ -7,3 +7,4 @@ Click [here](https://pyogenics.github.io/Tanki-map-toolkit/) to try it.
 - [ ] Propyl loading
 - [ ] Map loading
 - [ ] Map tools and editing
+- [ ] Tara/propyl editor
