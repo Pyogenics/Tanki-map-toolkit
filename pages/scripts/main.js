@@ -37,8 +37,20 @@ function main()
 function loadPropyl(event)
 {
 	console.log("Loading propyl....");
+
+	// XXX: Handle empty file uploads
+
+	let files = [];
 	for (const file of event.target.fileArea.files)
 	{
 		console.log(file.webkitRelativePath);
+		const fileReader = new FileReader();
+		fileReader.files = files;
+		fileReader.addEventListener("error", () => { console.error("Failed to load file from propyl!"); });
+		fileReader.addEventListener("load", (event) => { console.log("Loaded"); event.target.files.push(event.target.result); });
+		fileReader.readAsArrayBuffer(file);
 	}
+
+	// XXX: We should wait for all the files to finish loading, make an elegant fetching solution!
+	console.log(files);
 }
