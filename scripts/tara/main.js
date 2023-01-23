@@ -56,8 +56,20 @@ function unPackTara(event)
 	console.log("Unpacking %s", event.target.fileName);
 	const tara = new Tara();
 	tara.addEventListener("parse", (event) => {
-		console.log("Parsed!");
-		console.log(event.target.files);
+		const fileTable = document.getElementById("files");
+		console.log(fileTable);
+		for (const file of event.target.files)
+		{
+			const row = document.createElement("tr");
+			const fileName = document.createElement("td");
+			const size = document.createElement("td");
+
+			fileName.appendChild(document.createTextNode(file[0]));
+			size.appendChild(document.createTextNode(file[1]));
+			row.appendChild(fileName);
+			row.appendChild(size);
+			fileTable.appendChild(row);
+		}
 	});
 	tara.addEventListener("error", (event) => {
 		console.error(event.target.Error);

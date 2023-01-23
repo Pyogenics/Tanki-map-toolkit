@@ -3,7 +3,31 @@ body {
 }
 
 main {
+	align-content: stretch;
+}
+
+
+main h2 {
+	margin: 0%;
+}
+
+main div {
 	padding: 2em;
+}
+
+#filebrowser {
+	flex-grow: 3;
+}
+
+#filebrowser table {
+	box-shadow: rgba(0, 0, 0, 0.35) 0px 3px 7px;
+	display: block;
+	height: 100vh;
+	overflow: scroll;
+}
+
+#inspector {
+	flex-grow: 1;
 }
 
 #upload-files-popup {
