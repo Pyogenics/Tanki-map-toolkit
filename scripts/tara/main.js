@@ -24,8 +24,14 @@ function main()
 {
 	console.log("Starting...");
 
+	let taras = [];
 	const taraInput = document.getElementById("tara-input");
+	taraInput.taras = taras;
 	taraInput.addEventListener("change", loadTaras);
+
+	const downloadAll = document.getElementById("download-all");
+	downloadAll.taras = taras;
+	downloadAll.addEventListener("click", downloadAllFiles);
 
 	console.log("Done");
 }
@@ -44,6 +50,7 @@ function loadTaras(event)
         for (const file of event.target.files)
         {
 		const reader = new FileReader();
+		reader.taras = event.target.taras;
 		reader.fileName = file.webkitRelativePath;
 		reader.addEventListener("load", unPackTara);
 		reader.addEventListener("error", taraLoadError);
@@ -55,17 +62,19 @@ function unPackTara(event)
 {
 	console.log("Unpacking %s", event.target.fileName);
 	const tara = new Tara();
+	tara.taras = event.target.taras;
 	tara.addEventListener("parse", (event) => {
 		const fileTable = document.getElementById("files");
-		console.log(fileTable);
 		for (const file of event.target.files)
 		{
+			event.target.taras.push(file);
+
 			const row = document.createElement("tr");
 			const fileName = document.createElement("td");
 			const size = document.createElement("td");
 
-			fileName.appendChild(document.createTextNode(file[0]));
-			size.appendChild(document.createTextNode(file[1]));
+			fileName.appendChild(document.createTextNode(file.name));
+			size.appendChild(document.createTextNode(file.size));
 			row.appendChild(fileName);
 			row.appendChild(size);
 			fileTable.appendChild(row);
@@ -75,6 +84,18 @@ function unPackTara(event)
 		console.error(event.target.Error);
 	});
 	tara.parse(event.target.result);
+}
+
+function downloadAllFiles(event)
+{
+	console.log("Downloading files...");
+	for (const file of event.target.taras)
+	{
+		const link = document.createElement("a");
+		link.href = URL.createObjectURL(file); // XXX: Revoke this
+		link.download = file.name;
+		link.click();
+	}
 }
 
 /* Error events */
