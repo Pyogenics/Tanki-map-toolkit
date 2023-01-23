@@ -1,3 +1,23 @@
+body {
+	overflow: hidden;
+}
+
 main {
 	padding: 2em;
+}
+
+#upload-files-popup {
+	justify-content: center;
+	align-items: center;
+	height: 100%; /* FIXME: Not perfectly center and bad */
+}
+
+#upload-files-popup div {
+	padding: 2em;
+	box-shadow: rgba(0, 0, 0, 0.35) 0px 3px 7px;
+}
+
+#upload-files-popup div h2 {
+	margin-top: 0%;
+	margin-bottom: 2em;
 }

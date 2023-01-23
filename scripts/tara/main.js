@@ -32,6 +32,12 @@ function main()
 
 function loadTaras(event)
 {
+	// Hide pop up before loading files
+	const popup = document.getElementById("upload-files-popup");
+	popup.classList.add("hidden");
+	const main = document.getElementsByTagName("main")[0];
+	main.classList.remove("hidden");
+
 	console.log("Loading taras");
 
 	// XXX: Add a check if we have tara files or not and for empty uploads
@@ -57,7 +63,6 @@ function unPackTara(event)
 		console.error(event.target.Error);
 	});
 	tara.parse(event.target.result);
-	tara.parse();
 }
 
 /* Error events */

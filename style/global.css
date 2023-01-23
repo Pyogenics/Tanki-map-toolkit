@@ -13,5 +13,8 @@ header h1 {
 
 .flex-container {
 	display: flex;
-	justify-content: space-between;
+}
+
+.hidden {
+	display: none;
 }
