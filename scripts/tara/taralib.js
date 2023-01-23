@@ -72,10 +72,6 @@ class Tara extends EventTarget
 			this.files.push(file);			
 		}
 
-		console.log(sizes);
-		console.log(names);
-		console.log(this.files);
-
 		this.dispatchEvent(this.parseEvent);
 	}
 }
