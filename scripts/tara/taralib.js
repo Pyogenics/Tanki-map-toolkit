@@ -118,3 +118,5 @@ class byteStream extends DataView
         return bytes
     }
 }
+
+export { Tara };
