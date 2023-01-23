@@ -37,8 +37,10 @@ class Tara extends EventTarget
 		}
 
 		this.buffer = new byteStream(file);
-
 		const numFiles = this.buffer.getUint32();
+
+		let names = [];
+		let sizes = [];
 
 		// Get file names and lengths
 		for (let fileIdx = 0; fileIdx != numFiles; fileIdx++)
@@ -52,20 +54,27 @@ class Tara extends EventTarget
 			name = String.fromCharCode(...name);
 			const size = this.buffer.getUint32();
 
-			this.files.push([name, size]);
+			names.push(name);
+			sizes.push(size);
 		}
 
 		// Get file contents
-		for (let fileIdx = 0; fileIdx != this.files.length; fileIdx++)
+		for (let fileIdx = 0; fileIdx != numFiles; fileIdx++)
 		{
-			const content = new ArrayBuffer(this.files[fileIdx][1]);
+			const content = new ArrayBuffer(sizes[fileIdx]);
 			const contentView = new Int8Array(content);
-			for (let fileContentIdx = 0; fileContentIdx != this.files[fileIdx][1]; fileContentIdx++)
+			for (let fileContentIdx = 0; fileContentIdx != sizes[fileIdx]; fileContentIdx++)
 			{
 				contentView[fileContentIdx] = this.buffer.getInt8();
 			}
-			this.files[fileIdx].push(content);
+
+			const file = new File([content], names[fileIdx]);
+			this.files.push(file);			
 		}
+
+		console.log(sizes);
+		console.log(names);
+		console.log(this.files);
 
 		this.dispatchEvent(this.parseEvent);
 	}
