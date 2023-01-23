@@ -1,0 +1,17 @@
+header {
+	background-color: #000000;
+	color: #ffffff;
+
+	padding: 1.5em;
+	padding-left: 2em;
+}
+
+header h1 {
+	margin-bottom: 0%;
+	margin-top: 0%;
+}
+
+.flex-container {
+	display: flex;
+	justify-content: space-between;
+}

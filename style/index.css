@@ -1,26 +1,8 @@
-body {
-	margin: 0%;
+#Tools {
+	padding: 2em;
 }
 
-header {
-	padding: 0.1em;
-	padding-left: 2em;
-
-	background-color: #000000;
-	color: #ffffff;
-}
-
-main {
-	padding: 0.25em;
-	padding-left: 2em;
-}
-
-main a {
-	color: #000000;
+#Tools a {
 	text-decoration: none;
-}
-
-.flex-container {
-	display: flex;
-	justify-content: space-around;
+	color: #000000;
 }
