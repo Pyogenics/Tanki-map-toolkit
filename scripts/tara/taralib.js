@@ -16,20 +16,30 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class Tara
+// XXX: Implement checks and error handling!
+class Tara extends EventTarget
 {
-	constructor(ArrayBuffer, parseCallback)
+	constructor()
 	{
-		this.callback = parseCallback;
-		this.buffer = new byteStream(ArrayBuffer);
-		this.files = [];
+		super();
+		this.parseEvent = new Event("parse");
+		this.parseErrorEvent = new Event("error");
 
-		this.parse();
+		this.files = [];
 	}
 
-	parse()
+	parse(file)
 	{
+		if (this.files.length != 0)
+		{
+			this.Error = "parse: Files array not empty; this function can only be used once!";
+			this.dispatchEvent(this.parseErrorEvent);
+		}
+
+		this.buffer = new byteStream(file);
+
 		const numFiles = this.buffer.getUint32();
+
 		// Get file names and lengths
 		for (let fileIdx = 0; fileIdx != numFiles; fileIdx++)
 		{
@@ -57,7 +67,7 @@ class Tara
 			this.files[fileIdx].push(content);
 		}
 
-		this.callback(this);
+		this.dispatchEvent(this.parseEvent);
 	}
 }
 

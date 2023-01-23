@@ -48,9 +48,16 @@ function loadTaras(event)
 function unPackTara(event)
 {
 	console.log("Unpacking %s", event.target.fileName);
-	const tara = new Tara(event.target.result, (tara) => {
-		console.log(tara.files);
+	const tara = new Tara();
+	tara.addEventListener("parse", (event) => {
+		console.log("Parsed!");
+		console.log(event.target.files);
 	});
+	tara.addEventListener("error", (event) => {
+		console.error(event.target.Error);
+	});
+	tara.parse(event.target.result);
+	tara.parse();
 }
 
 /* Error events */
