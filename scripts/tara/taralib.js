@@ -28,12 +28,13 @@ class Tara extends EventTarget
 		this.files = [];
 	}
 
-	parse(file)
+	parseFromFile(file)
 	{
 		if (this.files.length != 0)
 		{
 			this.Error = "parse: Files array not empty; this function can only be used once!";
 			this.dispatchEvent(this.parseErrorEvent);
+			return -1;
 		}
 
 		this.buffer = new byteStream(file);
@@ -74,6 +75,86 @@ class Tara extends EventTarget
 
 		this.dispatchEvent(this.parseEvent);
 	}
+}
+
+class PropLibrary extends EventTarget
+{
+	constructor()
+	{
+		super();
+		this.parseEvent = new Event("parse");
+		this.parseErrorEvent = new Event("error");
+	
+		this.props = new Object();
+	}
+
+	// XXX: Slow?
+	parseFromTara(tara)
+	{
+		this.files = tara.files; // XXX: Is this necessary
+		let imagesXML = undefined;
+		let libraryXML = undefined;
+
+		// Find image and library xml
+		for (const file of tara.files)
+		{
+			// XXX: Should duplicates be handled?
+			if (file.name === "library.xml")
+			{
+				libraryXML = file;
+			}
+			else if (file.name === "images.xml")
+			{
+				imagesXML = file;
+			}
+			if (imagesXML !== undefined && libraryXML !== undefined)
+			{
+				break;
+			}
+		}
+
+		if (libraryXML === undefined)
+		{
+			this.Error = "parseFromTara: library.xml missing! Is the library correct?";
+			this.dispatchEvent(this.parseErrorEvent);
+			return -1;
+		}
+	
+		this.parseLibrary(libraryXML);
+	}
+
+	// XXX: clean this up!
+	parseLibrary(libraryXML)
+	{
+		libraryXML.text().then((result) => { 
+			const parser = new DOMParser();
+			const xml = parser.parseFromString(result, "text/xml"); 
+
+			this.name = xml.documentElement.getAttribute("name");
+			for (const propGroup of xml.documentElement.children)
+			{
+				this.props[propGroup.getAttribute("name")] = new Object();
+				for (const prop of propGroup.children)
+				{
+					this.props[propGroup.getAttribute("name")][prop.getAttribute("name")] = prop.children[0].getAttribute("file");
+				}
+			}
+
+			this.dispatchEvent(this.parseEvent);
+		});
+	}
+
+/*
+	parseFromFileList(fileList)
+	{
+		
+	}
+
+	parseFromArray(fileArray)
+	{
+
+	}
+*/
 }
 
 class byteStream extends DataView
@@ -134,4 +215,4 @@ class byteStream extends DataView
     }
 }
 
-export { Tara };
+export { Tara, PropLibrary };
