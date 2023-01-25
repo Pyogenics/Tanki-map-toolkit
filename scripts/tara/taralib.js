@@ -25,12 +25,12 @@ class Tara extends EventTarget
 		this.parseEvent = new Event("parse");
 		this.parseErrorEvent = new Event("error");
 
-		this.files = [];
+		this.files = new Object();
 	}
 
 	parseFromFile(file)
 	{
-		if (this.files.length != 0)
+		if (Object.keys(this.files).length != 0)
 		{
 			this.Error = "parse: Files array not empty; this function can only be used once!";
 			this.dispatchEvent(this.parseErrorEvent);
@@ -55,25 +55,32 @@ class Tara extends EventTarget
 			name = String.fromCharCode(...name);
 			const size = this.buffer.getUint32();
 
-			names.push(name);
-			sizes.push(size);
+			this.files[name] = new Object();
+			this.files[name].size = size;
 		}
 
-		// Get file contents
-		for (let fileIdx = 0; fileIdx != numFiles; fileIdx++)
-		{
-			const content = new ArrayBuffer(sizes[fileIdx]);
-			const contentView = new Int8Array(content);
-			for (let fileContentIdx = 0; fileContentIdx != sizes[fileIdx]; fileContentIdx++)
-			{
-				contentView[fileContentIdx] = this.buffer.getInt8();
-			}
-
-			const file = new File([content], names[fileIdx]);
-			this.files.push(file);			
-		}
+		const files = Object.values(this.files);
+		files[0].offset = this.buffer.bytePTR;
+		// Pre calculate offsets
+		for (let fileIdx = 1; fileIdx != files.length; fileIdx++)
+			files[fileIdx].offset = files[fileIdx-1].offset + files[fileIdx-1].size; // Start offset of previous file + size of previous file = offset of this file
 
 		this.dispatchEvent(this.parseEvent);
+	}
+
+	getFile(name)
+	{
+		const fileInfo = this.files[name];
+		const buffer = new ArrayBuffer(fileInfo.size);
+		const buffView = new Int8Array(buffer);
+
+		this.buffer.bytePTR = fileInfo.offset;
+		for (let byteIdx = 0; byteIdx != fileInfo.size; byteIdx++)
+		{
+			buffView[byteIdx] = this.buffer.getInt8()
+		}
+
+		return new File([buffer], name);
 	}
 }
 
@@ -97,16 +104,16 @@ class PropLibrary extends EventTarget
 		let libraryXML = undefined;
 
 		// Find image and library xml
-		for (const file of tara.files)
+		for (const fileName in tara.files)
 		{
 			// XXX: Should duplicates be handled?
-			if (file.name === "library.xml")
+			if (fileName === "library.xml")
 			{
-				libraryXML = file;
+				libraryXML = tara.getFile(fileName);
 			}
-			else if (file.name === "images.xml")
+			else if (fileName === "images.xml")
 			{
-				imagesXML = file;
+				imagesXML = tara.getFile(fileName);
 			}
 			if (imagesXML !== undefined && libraryXML !== undefined)
 			{
@@ -180,7 +187,7 @@ class PropLibrary extends EventTarget
 	buildImages()
 	{
 		console.warn("There is no images.xml! Is this an old style prop library? Building images......");
-		for (const file of this.files)
+		for (const file of Object.values(this.files))
 		{
 			if (file.name === "library.xml")
 				continue;
