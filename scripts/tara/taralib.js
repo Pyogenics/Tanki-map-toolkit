@@ -86,6 +86,7 @@ class PropLibrary extends EventTarget
 		this.parseErrorEvent = new Event("error");
 	
 		this.props = new Object();
+		this.images = new Object();
 	}
 
 	// XXX: Slow?
@@ -119,13 +120,24 @@ class PropLibrary extends EventTarget
 			this.dispatchEvent(this.parseErrorEvent);
 			return -1;
 		}
-	
-		this.parseLibrary(libraryXML);
+
+		const parseXML = new Promise((resolve, reject) => {
+			if (imagesXML === undefined)
+				this.buildImages();
+			else
+				this.parseImages(imagesXML);
+			this.parseLibrary(libraryXML);
+			resolve();
+		});
+		parseXML.then(() => {
+			this.dispatchEvent(this.parseEvent);
+		});
 	}
 
 	// XXX: clean this up!
 	parseLibrary(libraryXML)
 	{
+		// XXX: Handle errors where we receive non text files
 		libraryXML.text().then((result) => { 
 			const parser = new DOMParser();
 			const xml = parser.parseFromString(result, "text/xml"); 
@@ -139,9 +151,43 @@ class PropLibrary extends EventTarget
 					this.props[propGroup.getAttribute("name")][prop.getAttribute("name")] = prop.children[0].getAttribute("file");
 				}
 			}
-
-			this.dispatchEvent(this.parseEvent);
 		});
+	}
+
+	parseImages(imagesXML)
+	{
+		imagesXML.text().then((result) => {
+			const parser = new DOMParser();
+			const xml = parser.parseFromString(result, "text/xml");
+			
+			for (const image of xml.documentElement.children)
+			{
+				const name = image.getAttribute("name");
+				const newName = image.getAttribute("new-name");
+				const alpha = image.getAttribute("alpha");
+
+				this.images[newName] = new Object();
+				this.images[newName]["name"] = name;
+				// XXX: Probably should just leave it as null? More efficient that way
+				if (alpha)
+					this.images[newName]["alpha"] = alpha;
+				else
+					this.images[newName]["alpha"] = undefined;
+			}
+		});
+	}
+
+	buildImages()
+	{
+		console.warn("There is no images.xml! Is this an old style prop library? Building images......");
+		for (const file of this.files)
+		{
+			if (file.name === "library.xml")
+				continue;
+			this.images[file.name] = new Object();
+			this.images[file.name]["name"] = file.name; // Assume the names don't change, that's what you get for using old-style
+			this.images[file.name]["alpha"] = undefined; // XXX: Is there alpha????????????
+		}
 	}
 
 /*
