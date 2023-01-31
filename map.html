@@ -22,5 +22,34 @@
 </head>
 <body>
 	<h1>!!Map tool placeholder text!!</h1>
+	<input type="file" accept=".xml" id="map-input"></input>
+
+
+<script type="module">
+window.onload = init
+
+function init()
+{
+	console.log("Starting...");
+	const fileSubmit = document.getElementById("map-input");
+	fileSubmit.addEventListener("change", loadMap);
+}
+
+function loadMap(event)
+{
+	console.log("Loading map");
+	const reader = new FileReader();
+	reader.addEventListener("load", parseMap);
+	reader.addEventListener("error", (event) => {
+		throw event.Error;
+	});
+	reader.readAsText(event.target.files[0]);
+}
+
+function parseMap(event)
+{
+	console.log(event.target.result);
+}
+</script>
 </body>
 </html>
