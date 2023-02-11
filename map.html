@@ -25,7 +25,16 @@
 	<input type="file" accept=".xml" id="map-input"></input>
 
 
+<script type="importmap">
+{
+	"imports": {
+		"MapParser": "./scripts/map/MapParser.js"
+	}
+}
+</script>
 <script type="module">
+	import { Map } from "MapParser";
+
 window.onload = init
 
 function init()
@@ -48,7 +57,8 @@ function loadMap(event)
 
 function parseMap(event)
 {
-	console.log(event.target.result);
+	const map = new Map();
+	map.parseFromString(event.target.result);
 }
 </script>
 </body>
