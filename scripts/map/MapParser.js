@@ -20,7 +20,8 @@ class Map
 {
 	constructor()
 	{
-		this.map = new Object();
+		this.props = [];
+		this.collision = new Object();
 	}
 
 	parseFromString(mapText)
@@ -29,11 +30,28 @@ class Map
 		const xml = parser.parseFromString(mapText, "text/xml");
 
 		const map = xml.documentElement; // The first tag should be <map></map> and nothing else afterwards
-		const staticGeom = map.firstChild;
-		const collisionGeom = map.lastChild; // XXX: Handle no collision geometry: this is usually gonna be a version 3.0 map
+		const staticGeom = map.firstElementChild;
+		const collisionGeom = map.lastElementChild; // XXX: Handle no collision geometry: this is usually gonna be a version 3.0 map
 
-		console.log(staticGeom);
-		console.log(collisionGeom);
+		for (const propXML of staticGeom.children)
+		{
+			const prop = new Object();
+			const position = propXML.firstElementChild;
+			prop.x = Number(position.getElementsByTagName("x")[0].textContent);
+			prop.y = Number(position.getElementsByTagName("y")[0].textContent);
+			prop.z = Number(position.getElementsByTagName("z")[0].textContent);
+			prop.rotation = Number(propXML.getElementsByTagName("rotation")[0].firstElementChild.textContent); // The rotation always only contains z?
+
+			prop.geometry = new Object();
+			const attributes = propXML.attributes;
+			prop.geometry.library = attributes["library-name"].value;
+			prop.geometry.group = attributes["group-name"].value;
+			prop.geometry.name = attributes["name"].value;
+			
+			prop.texture = propXML.getElementsByTagName("texture-name")[0].textContent;
+
+			this.props.push(prop);
+		}
 	}
 }
 
