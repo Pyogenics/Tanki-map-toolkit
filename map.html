@@ -19,21 +19,31 @@
 <head>
 	<title>Tanki map toolkit</title>
 	<link rel="stylesheet" href="https://unpkg.com/normalize.css@8.0.1/normalize.css">
+	<style>
+		.hidden {
+			display: none !important;
+		}
+	</style>
 </head>
 <body>
 	<h1>!!Map tool placeholder text!!</h1>
 	<input type="file" accept=".xml" id="map-input"></input>
-
-
+	<canvas id="viewport" class="hidden"></canvas>
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 <script type="importmap">
 {
 	"imports": {
-		"MapParser": "./scripts/map/MapParser.js"
+		"MapParser": "./scripts/map/MapParser.js",
+		"renderer":  "./scripts/3d/view.js",
+		"three": "https://unpkg.com/three/build/three.module.js",
+		"threeTDSLoader": "https://unpkg.com/three/examples/jsm/loaders/TDSLoader.js"
 	}
 }
 </script>
 <script type="module">
-	import { Map } from "MapParser";
+import { Map } from "MapParser";
+import { Renderer } from "renderer";
+import * as THREE from "three";
 
 window.onload = init
 
@@ -59,6 +69,25 @@ function parseMap(event)
 {
 	const map = new Map();
 	map.parseFromString(event.target.result);
+
+	// Now hide the selection and continue to displaying the map
+        document.getElementById("map-input").classList.add("hidden");
+        document.getElementById("viewport").classList.remove("hidden");
+        showMap();
+}
+
+function showMap(map)
+{
+	// Create renderer
+	const renderer = new Renderer();
+	renderer.bindToCanvas(document.getElementById("viewport"));
+	renderer.camera.position.z = 5;
+	// Add geometry
+	const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+	const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+	const cube = new THREE.Mesh( geometry, material );
+
+	renderer.addObject(cube);
 }
 </script>
 </body>
