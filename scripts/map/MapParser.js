@@ -22,6 +22,9 @@ class Map
 	{
 		this.props = [];
 		this.collision = new Object();
+		this.collision.planes = [];
+		this.collision.triangles = [];
+		this.collision.boxes = [];
 	}
 
 	parseFromString(mapText)
@@ -52,6 +55,23 @@ class Map
 
 			this.props.push(prop);
 		}
+		for (const collisionXML of collisionGeom.children)
+		{
+			const collision = new Object();
+			switch (collisionXML.nodeName)
+			{
+				case "collision-plane":
+					collision.width = Number(collisionXML.getElementsByTagName("width")[0].textContent);
+					collision.length = Number(collisionXML.getElementsByTagName("length")[0].textContent);
+					collision.x = Number(collisionXML.getElementsByTagName("x")[0].textContent);
+					collision.y = Number(collisionXML.getElementsByTagName("y")[0].textContent);
+					collision.z = Number(collisionXML.getElementsByTagName("z")[0].textContent);
+
+					this.collision.planes.push(collision);
+					break;
+			}
+		}
+			console.log(this.collision);
 	}
 }
 
